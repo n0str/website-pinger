@@ -8,8 +8,8 @@ type PingResponse struct {
 }
 
 type CheckRule struct {
-	url string
-	desiredStatusCode int
+	Url string
+	DesiredStatusCode int
 }
 
 type job struct {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 )
@@ -55,18 +56,6 @@ func apiGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set statusCode and validate value.
-	status := r.FormValue("status_code")
-	if status == "" {
-		http.Error(w, "You must specify a status code.", http.StatusBadRequest)
-		return
-	}
-	statusCode, err := strconv.Atoi(status)
-	if err != nil {
-		http.Error(w, "Invalid status code.", http.StatusBadRequest)
-		return
-	}
-
 	// Set url and validate value.
 	url := r.FormValue("url")
 	if url == "" {
@@ -74,8 +63,19 @@ func apiGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rulesMap[url] = CheckRule{url, statusCode}
+	// Find rule for the URL
+	data, ok := rulesMap[url]
+	if ok {
+		w.WriteHeader(http.StatusOK)
+		// Return Rule Data
+		err := json.NewEncoder(w).Encode(data)
+		if err != nil {
+			http.Error(w, "Fatal error. JSON exception", http.StatusBadRequest)
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 
-	w.WriteHeader(http.StatusCreated)
 	return
 }

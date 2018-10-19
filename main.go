@@ -49,11 +49,13 @@ func loadRules() {
 }
 
 func doTask(rule CheckRule) {
-	r := getPing(rule.url)
+	r := getPing(rule.Url)
 	if r.result {
-		fmt.Printf("Url %s [OK]\n", rule.url)
+		fmt.Printf("Url %s [OK]\n", rule.Url)
 	} else {
-		fmt.Printf("Url %s [FAIL] - status=%d, cause=%s\n", rule.url, r.statusCode, r.message)
+		// Inform about failure
+		inform(rule, r)
+		//fmt.Printf("Url %s [FAIL] - status=%d, cause=%s\n", rule.Url, r.statusCode, r.message)
 	}
 }
 
