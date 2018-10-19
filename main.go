@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -10,22 +13,36 @@ import (
 )
 
 var rules []CheckRule
-var maxQueueSize = 100
-var maxWorkers = 5
-var jobs = make(chan job, maxQueueSize)
+var rulesMap = make(map[string]CheckRule)
+var maxWorkers = 100
+var maxQueueSize = 5
+var jobs chan job
 
 func main() {
+	maxQueueSize = *flag.Int("max_queue_size", 100, "The size of job queue")
+	maxWorkers   = *flag.Int("max_workers", 5, "The number of workers to start")
+	var (
+		port         = flag.String("port", "8080", "The server port")
+	)
+	flag.Parse()
+
+	jobs = make(chan job, maxQueueSize)
+
 	println("Hello World!")
 	rand.Seed(time.Now().UTC().UnixNano())
 	loadRules()
+	initAPIHandlers()
 	runLoop()
+	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
 
 func loadRules() {
 	var newRules []CheckRule
 	newRules = append(newRules, CheckRule{"https://github.com", 200} )
-	for i := 0; i <= 10; i++ {
-		newRule := CheckRule{fmt.Sprintf("https://github.com/%d", i), 200}
+	for i := 0; i <= 5; i++ {
+		newUrl := fmt.Sprintf("https://github.com/%d", i)
+		newRule := CheckRule{newUrl, 200}
+		rulesMap[newUrl] = newRule
 		newRules = append(newRules, newRule)
 	}
 	rules = newRules
@@ -44,7 +61,7 @@ func doTask(rule CheckRule) {
 func runLoop() {
 	var endWaiter sync.WaitGroup
 	endWaiter.Add(1)
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 
 	var signalChannel chan os.Signal
 	signalChannel = make(chan os.Signal, 1)
@@ -66,15 +83,16 @@ func runLoop() {
 				runTasks()
 			case <- signalChannel:
 				ticker.Stop()
-				endWaiter.Done()
 			}
 		}
 	}()
-	endWaiter.Wait()
 }
 
 func runTasks() {
-	for _, j  := range rules {
-		jobs <- job{j}
+	//for _, j  := range rules {
+	//	jobs <- job{j}
+	//}
+	for _, value := range rulesMap {
+		jobs <- job{value}
 	}
 }
