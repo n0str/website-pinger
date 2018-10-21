@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"net/url"
 )
 
 func initAPIHandlers() {
@@ -36,13 +37,19 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set url and validate value.
-	url := r.FormValue("url")
-	if url == "" {
+	ruleUrl := r.FormValue("url")
+	if ruleUrl == "" {
 		http.Error(w, "You must specify an URL.", http.StatusBadRequest)
 		return
 	}
 
-	rulesMap[url] = CheckRule{url, statusCode}
+	urlStruct, err := url.ParseRequestURI(ruleUrl)
+	if err != nil {
+		panic(err)
+	}
+
+	dbSet(urlStruct.Host, ruleUrl)
+	rulesMap[ruleUrl] = CheckRule{ruleUrl, statusCode}
 
 	w.WriteHeader(http.StatusCreated)
 	return

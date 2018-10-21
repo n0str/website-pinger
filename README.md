@@ -1,7 +1,8 @@
 # website-pinger
 Async website uptime checker on Go
 
-## Make /count API action
+## Save rules to DB
+## Load rules from DB
 ## Add arguments for queue size, workers count, port number, logging filename and secure token
 ## Add middleware for secure token check
 ## Add POST request to informer
