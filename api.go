@@ -48,8 +48,8 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	dbSet(urlStruct.Host, ruleUrl)
 	rulesMap[ruleUrl] = CheckRule{ruleUrl, statusCode}
+	dbSet(urlStruct.Host, rulesMap[ruleUrl])
 
 	w.WriteHeader(http.StatusCreated)
 	return
