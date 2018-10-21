@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"net/url"
@@ -13,6 +14,9 @@ func initAPIHandlers() {
 	})
 	http.HandleFunc("/api/get", func(w http.ResponseWriter, r *http.Request) {
 		apiGetHandler(w, r)
+	})
+	http.HandleFunc("/api/reload", func(w http.ResponseWriter, r *http.Request) {
+		apiReloadHandler(w, r)
 	})
 }
 
@@ -99,4 +103,15 @@ func apiGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	return
+}
+
+func apiReloadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.Header().Set("Allow", "GET")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	rulesMap = make(map[string]CheckRule)
+	dbReload()
+	log.Println("[API] apiReloadHandler() — Reload rules")
 }

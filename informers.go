@@ -10,7 +10,7 @@ import (
 
 func inform(rule CheckRule, response PingResponse) {
 	var message string
-	fmt.Printf("Inform %s", rule.Url)
+	fmt.Printf("Inform %s\n", rule.Url)
 	if !response.result {
 		message = fmt.Sprintf("Failed to connect: %s.\n_%s_", rule.Url, response.message)
 	} else {
