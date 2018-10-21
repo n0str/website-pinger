@@ -34,28 +34,18 @@ func main() {
 
 	dbReload()
 	//os.Exit(1)
-	//loadRules()
 	initAPIHandlers()
 	runLoop()
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
 
-func loadRules() {
-	for i := 0; i <= 5; i++ {
-		newUrl := fmt.Sprintf("https://github.com/%d", i)
-		newRule := CheckRule{newUrl, 200}
-		rulesMap[newUrl] = newRule
-	}
-}
-
 func doTask(rule CheckRule) {
 	r := getPing(rule.Url)
-	if r.result {
+	if r.result && r.statusCode == rule.DesiredStatusCode {
 		fmt.Printf("Url %s [OK]\n", rule.Url)
 	} else {
 		// Inform about failure
 		inform(rule, r)
-		//fmt.Printf("Url %s [FAIL] - status=%d, cause=%s\n", rule.Url, r.statusCode, r.message)
 	}
 }
 
@@ -91,9 +81,6 @@ func runLoop() {
 }
 
 func runTasks() {
-	//for _, j  := range rules {
-	//	jobs <- job{j}
-	//}
 	for _, value := range rulesMap {
 		jobs <- job{value}
 	}

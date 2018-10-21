@@ -20,13 +20,17 @@ func dbGet(filename string, rule *CheckRule) bool {
 		log.Printf("[database] dbReload() Open Exception: %p", err.Error())
 		return false
 	}
-	data := make([]byte, 100)
+	data := make([]byte, 1024)
 	count, err := file.Read(data)
 	if err != nil {
 		log.Printf("[database] dbReload() Read Exception: %p", err.Error())
 		return false
 	}
-	json.Unmarshal(data[:count], rule)
+	err = json.Unmarshal(data[:count], rule)
+	if err != nil {
+		log.Printf("[database] dbReload() Unmarshall Exception: %p", err.Error())
+		return false
+	}
 	return true
 }
 

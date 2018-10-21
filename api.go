@@ -48,7 +48,21 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	rulesMap[ruleUrl] = CheckRule{ruleUrl, statusCode}
+	informerType := r.FormValue("informer_type")
+	informerTypeCode, err := strconv.Atoi(informerType)
+	if err != nil {
+		http.Error(w, "You must specify an informer type.", http.StatusBadRequest)
+		return
+	}
+
+	informerPayload := r.FormValue("informer_payload")
+	if informerPayload == "" {
+		http.Error(w, "You must specify an informer payload.", http.StatusBadRequest)
+		return
+	}
+
+
+	rulesMap[ruleUrl] = CheckRule{ruleUrl, statusCode, InformerData{informerTypeCode, informerPayload}}
 	dbSet(urlStruct.Host, rulesMap[ruleUrl])
 
 	w.WriteHeader(http.StatusCreated)
