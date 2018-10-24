@@ -5,4 +5,3 @@ Async website uptime checker on Go
 ## Add middleware for secure token check
 ## Add tests for API
 ## Write readme
-## Deploy on production server
