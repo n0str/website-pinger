@@ -18,6 +18,12 @@ func initAPIHandlers() {
 	http.HandleFunc("/api/reload", func(w http.ResponseWriter, r *http.Request) {
 		apiReloadHandler(w, r)
 	})
+	http.HandleFunc("/api/list", func(w http.ResponseWriter, r *http.Request) {
+		apiListHandler(w, r)
+	})
+	http.HandleFunc("/api/delete", func(w http.ResponseWriter, r *http.Request) {
+		apiDeleteHandler(w, r)
+	})
 }
 
 func apiSetHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +55,8 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 
 	urlStruct, err := url.ParseRequestURI(ruleUrl)
 	if err != nil {
-		panic(err)
+		http.Error(w, "URL is invalid", http.StatusBadRequest)
+		return
 	}
 
 	informerType := r.FormValue("informer_type")
@@ -114,4 +121,54 @@ func apiReloadHandler(w http.ResponseWriter, r *http.Request) {
 	rulesMap = make(map[string]CheckRule)
 	dbReload()
 	log.Println("[API] apiReloadHandler() — Reload rules")
+}
+
+func apiListHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.Header().Set("Allow", "GET")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var urls = []string{}
+	for urlKey, _ := range rulesMap {
+		urls = append(urls, urlKey)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	// Return Rules URL
+	err := json.NewEncoder(w).Encode(urls)
+	if err != nil {
+		http.Error(w, "Fatal error. JSON exception", http.StatusBadRequest)
+		return
+	}
+
+	log.Println("[API] apiListHandler() — List rules")
+}
+
+func apiDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Make sure we can only be called with an HTTP POST request
+	if r.Method != "DELETE" {
+		w.Header().Set("Allow", "DELETE")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Set url and validate value.
+	ruleUrl := r.FormValue("url")
+	if ruleUrl == "" {
+		http.Error(w, "You must specify an URL.", http.StatusBadRequest)
+		return
+	}
+
+	urlStruct, err := url.ParseRequestURI(ruleUrl)
+	if err != nil {
+		http.Error(w, "URL is invalid", http.StatusBadRequest)
+		return
+	}
+
+	delete(rulesMap, ruleUrl)
+	dbDelete(urlStruct.Host, ruleUrl)
+
+	w.WriteHeader(http.StatusOK)
+	return
 }

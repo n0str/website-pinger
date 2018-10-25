@@ -14,6 +14,16 @@ func dbSet(hostname string, rule CheckRule) {
 	Save(filename, rule)
 }
 
+func dbDelete(hostname string, ruleUrl string) bool {
+	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(ruleUrl))
+	err := os.Remove(filename)
+	if err != nil {
+		log.Printf("[database] dbDelete() Remove Exception: %p", err.Error())
+		return false
+	}
+	return true
+}
+
 func dbGet(filename string, rule *CheckRule) bool {
 	file, err := os.Open(filename)
 	if err != nil {

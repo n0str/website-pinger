@@ -33,7 +33,6 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	dbReload()
-	//os.Exit(1)
 	initAPIHandlers()
 	runLoop()
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
