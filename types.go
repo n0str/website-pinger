@@ -1,28 +1,32 @@
 package main
 
+// PingResponse – HTTP Response from Website
 type PingResponse struct {
-	url string
-	result bool
-	message string
+	url        string
+	result     bool
+	message    string
 	statusCode int
 }
 
+// CheckRule – Ping settings for the URL
 type CheckRule struct {
-	Url string
+	URL               string
 	DesiredStatusCode int
-	InformerPayload InformerData
+	InformerPayload   InformerData
 }
 
+// InformerData – Payload data for Informer
 type InformerData struct {
-	Type int
+	Type    int
 	Payload string
 }
 
+// Running ping Job
 type job struct {
-	task     CheckRule
+	task CheckRule
 }
 
 const (
 	codexBotInformer = iota
-	hawkInformer = iota
+	hawkInformer     = iota
 )

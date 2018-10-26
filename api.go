@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"net/url"
+	"strconv"
 )
 
 func initAPIHandlers() {
@@ -47,13 +47,13 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set url and validate value.
-	ruleUrl := r.FormValue("url")
-	if ruleUrl == "" {
+	ruleURL := r.FormValue("url")
+	if ruleURL == "" {
 		http.Error(w, "You must specify an URL.", http.StatusBadRequest)
 		return
 	}
 
-	urlStruct, err := url.ParseRequestURI(ruleUrl)
+	urlStruct, err := url.ParseRequestURI(ruleURL)
 	if err != nil {
 		http.Error(w, "URL is invalid", http.StatusBadRequest)
 		return
@@ -72,9 +72,8 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	rulesMap[ruleUrl] = CheckRule{ruleUrl, statusCode, InformerData{informerTypeCode, informerPayload}}
-	dbSet(urlStruct.Host, rulesMap[ruleUrl])
+	rulesMap[ruleURL] = CheckRule{ruleURL, statusCode, InformerData{informerTypeCode, informerPayload}}
+	dbSet(urlStruct.Host, rulesMap[ruleURL])
 
 	w.WriteHeader(http.StatusCreated)
 	return
@@ -130,7 +129,7 @@ func apiListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var urls = []string{}
-	for urlKey, _ := range rulesMap {
+	for urlKey := range rulesMap {
 		urls = append(urls, urlKey)
 	}
 
@@ -154,20 +153,20 @@ func apiDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set url and validate value.
-	ruleUrl := r.FormValue("url")
-	if ruleUrl == "" {
+	ruleURL := r.FormValue("url")
+	if ruleURL == "" {
 		http.Error(w, "You must specify an URL.", http.StatusBadRequest)
 		return
 	}
 
-	urlStruct, err := url.ParseRequestURI(ruleUrl)
+	urlStruct, err := url.ParseRequestURI(ruleURL)
 	if err != nil {
 		http.Error(w, "URL is invalid", http.StatusBadRequest)
 		return
 	}
 
-	delete(rulesMap, ruleUrl)
-	dbDelete(urlStruct.Host, ruleUrl)
+	delete(rulesMap, ruleURL)
+	dbDelete(urlStruct.Host, ruleURL)
 
 	w.WriteHeader(http.StatusOK)
 	return

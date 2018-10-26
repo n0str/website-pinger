@@ -21,9 +21,9 @@ func main() {
 	SetupLogs()
 
 	maxQueueSize = *flag.Int("max_queue_size", 100, "The size of job queue")
-	maxWorkers   = *flag.Int("max_workers", 5, "The number of workers to start")
+	maxWorkers = *flag.Int("max_workers", 5, "The number of workers to start")
 	var (
-		port         = flag.String("port", "8080", "The server port")
+		port = flag.String("port", "8080", "The server port")
 	)
 	flag.Parse()
 
@@ -39,9 +39,9 @@ func main() {
 }
 
 func doTask(rule CheckRule) {
-	r := getPing(rule.Url)
+	r := getPing(rule.URL)
 	if r.result && r.statusCode == rule.DesiredStatusCode {
-		fmt.Printf("Url %s [OK]\n", rule.Url)
+		fmt.Printf("Url %s [OK]\n", rule.URL)
 	} else {
 		// Inform about failure
 		inform(rule, r)
@@ -70,9 +70,9 @@ func runLoop() {
 		runTasks()
 		for {
 			select {
-			case <- ticker.C:
+			case <-ticker.C:
 				runTasks()
-			case <- signalChannel:
+			case <-signalChannel:
 				ticker.Stop()
 			}
 		}

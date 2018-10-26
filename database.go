@@ -10,12 +10,12 @@ import (
 )
 
 func dbSet(hostname string, rule CheckRule) {
-	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(rule.Url))
+	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(rule.URL))
 	Save(filename, rule)
 }
 
-func dbDelete(hostname string, ruleUrl string) bool {
-	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(ruleUrl))
+func dbDelete(hostname string, ruleURL string) bool {
+	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(ruleURL))
 	err := os.Remove(filename)
 	if err != nil {
 		log.Printf("[database] dbDelete() Remove Exception: %p", err.Error())
@@ -53,11 +53,11 @@ func dbReload() {
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".db") {
 			var newRule CheckRule
-			if dbGet(dbPath + f.Name(), &newRule) != true {
+			if dbGet(dbPath+f.Name(), &newRule) != true {
 				log.Printf("[database] dbReload() Cannot unmarshal file: %s", f.Name())
 				continue
 			}
-			rulesMap[newRule.Url] = newRule
+			rulesMap[newRule.URL] = newRule
 		}
 	}
 	log.Println("[database] dbReload() Success")
