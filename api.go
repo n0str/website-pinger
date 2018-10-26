@@ -59,6 +59,8 @@ func apiSetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	print()
+
 	informerType := r.FormValue("informer_type")
 	informerTypeCode, err := strconv.Atoi(informerType)
 	if err != nil {

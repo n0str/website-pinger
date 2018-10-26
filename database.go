@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// dbSet – save rule to database
 func dbSet(hostname string, rule CheckRule) {
 	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(rule.URL))
 	Save(filename, rule)
@@ -18,7 +19,7 @@ func dbDelete(hostname string, ruleURL string) bool {
 	filename := fmt.Sprintf("%s%s__%s.db", dbPath, hostname, GetMD5Hash(ruleURL))
 	err := os.Remove(filename)
 	if err != nil {
-		log.Printf("[database] dbDelete() Remove Exception: %p", err.Error())
+		log.Printf("[database] dbDelete() Remove Exception: %s", err.Error())
 		return false
 	}
 	return true
@@ -27,18 +28,18 @@ func dbDelete(hostname string, ruleURL string) bool {
 func dbGet(filename string, rule *CheckRule) bool {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Printf("[database] dbReload() Open Exception: %p", err.Error())
+		log.Printf("[database] dbReload() Open Exception: %s", err.Error())
 		return false
 	}
 	data := make([]byte, 1024)
 	count, err := file.Read(data)
 	if err != nil {
-		log.Printf("[database] dbReload() Read Exception: %p", err.Error())
+		log.Printf("[database] dbReload() Read Exception: %s", err.Error())
 		return false
 	}
 	err = json.Unmarshal(data[:count], rule)
 	if err != nil {
-		log.Printf("[database] dbReload() Unmarshall Exception: %p", err.Error())
+		log.Printf("[database] dbReload() Unmarshall Exception: %s", err.Error())
 		return false
 	}
 	return true
